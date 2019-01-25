@@ -2,24 +2,44 @@ package com.zb.commons.date;
 
 
 import com.zb.commons.validate.CommonValidateUtil;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.util.Assert;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 日期操作工具类
  *
  * @author Administrator
  */
-public final class DateOperator {
+public class DateUtil implements DisposableBean {
 
-    private DateOperator() {
+    
+    public static final String DATE_FORMAT_STR = "yyyy-MM-dd";
+
+    public static final String DATETIME_FORMAT_STR = "yyyy-MM-dd HH:mm:ss";
+
+    private static final ThreadLocal<Map<String, SimpleDateFormat>> DATE_FORMAT = new ThreadLocal<Map<String, SimpleDateFormat>>() {
+        @Override
+        protected Map<String, SimpleDateFormat> initialValue() {
+            Map<String, SimpleDateFormat> map = new HashMap<>();
+            map.put(DATE_FORMAT_STR, new SimpleDateFormat(DATE_FORMAT_STR));
+            map.put(DATETIME_FORMAT_STR, new SimpleDateFormat(DATETIME_FORMAT_STR));
+            return map;
+        }
+    };
+
+    @Override
+    public void destroy() throws Exception {
+        DATE_FORMAT.remove();
     }
-
+    
     private static void validateDateNotNull(Date date, String exceptionTip) {
         if (date == null) {
             throw new IllegalArgumentException(exceptionTip);
@@ -416,10 +436,6 @@ public final class DateOperator {
         return calendar.get(GregorianCalendar.SECOND);
     }
 
-    public static final String FORMAT_STR = "yyyy-MM-dd";
-
-    public static final String FORMAT_STR_WITH_TIME = "yyyy-MM-dd HH:mm:ss";
-
 	/*----- 日期转换 START -----*/
 
     /**
@@ -433,7 +449,7 @@ public final class DateOperator {
      */
     public static Date defaultParseDate(String dateStr) {
         try {
-            return new SimpleDateFormat(FORMAT_STR).parse(dateStr);
+            return DATE_FORMAT.get().get(DATE_FORMAT_STR).parse(dateStr);
         } catch (Exception e) {
             throw new IllegalArgumentException("parameter date string is not available");
         }
@@ -450,7 +466,7 @@ public final class DateOperator {
      */
     public static Date defaultParseDateTime(String dateStr) {
         try {
-            return new SimpleDateFormat(FORMAT_STR_WITH_TIME).parse(dateStr);
+            return DATE_FORMAT.get().get(DATETIME_FORMAT_STR).parse(dateStr);
         } catch (Exception e) {
             throw new IllegalArgumentException("parameter date string is not available");
         }
@@ -460,24 +476,28 @@ public final class DateOperator {
      * 将具有指定格式的日期/时间字符串按照指定的描述日期/时间格式的规则转换为日期对象
      *
      * @param dateStr
-     * @param formatString
+     * @param format
      * @return
      */
-    public static Date parse(String dateStr, String formatString) {
+    public static Date parse(String dateStr, String format) {
         if (CommonValidateUtil.isEmpty(dateStr)) {
             return null;
         }
 
-        if (CommonValidateUtil.isEmpty(formatString)) {
-            formatString = FORMAT_STR_WITH_TIME;
+        if (CommonValidateUtil.isEmpty(format)) {
+            format = DATETIME_FORMAT_STR;
         }
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat(formatString);
+        SimpleDateFormat dateFormat = getDateFormat(format);
         try {
             return dateFormat.parse(dateStr);
         } catch (ParseException e) {
             throw new IllegalArgumentException("parameter date string is not available");
         }
+    }
+
+    private static SimpleDateFormat getDateFormat(String pattern) {
+        return DATE_FORMAT.get().computeIfAbsent(pattern, (k) -> new SimpleDateFormat(k));
     }
 	
 	/*----- 日期转换 END -----*/
@@ -495,50 +515,29 @@ public final class DateOperator {
      * @return
      */
     public static String defaultFormatDate(Date date) {
-        return defaultFormatDate(date, false);
+        return formatDate(date, DATE_FORMAT_STR);
     }
 
     /**
      * 将指定的日期对象按照缺省格式格式化为指定的日期字符串,可选择在格式化后是否保留时分秒
-     * <br />
-     * 缺省格式:yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss
-     * <br />
-     * 示例:2015-01-01 或 2015-01-01 00:00:00
      *
      * @param date
-     * @param withTime
      * @return
      */
-    public static String defaultFormatDate(Date date, boolean withTime) {
-
-        validateDateNotNull(date, "date is not available");
-
-        if (withTime) {
-            return formatDate(date, new SimpleDateFormat(FORMAT_STR_WITH_TIME));
-        } else {
-            return formatDate(date, new SimpleDateFormat(FORMAT_STR));
-        }
+    public static String defaultFormatDatetime(Date date) {
+        return formatDate(date, DATETIME_FORMAT_STR);
     }
 
     /**
      * 将指定的日期对象按照指定的日期时间格式串格式化为指定的日期字符串
      *
      * @param date
-     * @param formatString
+     * @param format
      * @return
      */
-    public static String formatDate(Date date, String formatString) {
-        return formatDate(date, new SimpleDateFormat(formatString));
-    }
-
-    public static String formatDate(Date date, DateFormat dateFormat) {
-        validateDateNotNull(date, "date is not available");
-
-        if (dateFormat == null) {
-            throw new IllegalArgumentException("parameter dateFormat is not available");
-        }
-
-        return dateFormat.format(date);
+    public static String formatDate(Date date, String format) {
+        Assert.notNull(date, "date must not be null");
+        return getDateFormat(format).format(date);
     }
 	
 	/*----- 日期格式化 END -----*/

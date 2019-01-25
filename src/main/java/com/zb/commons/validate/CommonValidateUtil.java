@@ -1,7 +1,7 @@
 package com.zb.commons.validate;
 
 
-import com.zb.commons.date.DateOperator;
+import com.zb.commons.date.DateUtil;
 
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -291,8 +291,8 @@ public final class CommonValidateUtil {
 			
 			String[] dateArr = valiPeriod.split("至");
 			
-			Date start = DateOperator.parse(dateArr[0], "yyyy-MM-dd");
-			Date end = DateOperator.parse(dateArr[1], "yyyy-MM-dd");
+			Date start = DateUtil.parse(dateArr[0], "yyyy-MM-dd");
+			Date end = DateUtil.parse(dateArr[1], "yyyy-MM-dd");
 			
 			if (start.compareTo(end) >= 0) {
 				return false;

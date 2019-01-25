@@ -1,6 +1,6 @@
 package com.zb.commons.random;
 
-import com.zb.commons.date.DateOperator;
+import com.zb.commons.date.DateUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Date;
@@ -14,7 +14,7 @@ public final class RandomUtil {
     }
     
     public static String formatDatetimeNumberic(int randomCount) {
-        return DateOperator.formatDate(new Date(), "yyyyMMddHHmmssSSS") + RandomStringUtils.randomNumeric(randomCount);
+        return DateUtil.formatDate(new Date(), "yyyyMMddHHmmssSSS") + RandomStringUtils.randomNumeric(randomCount);
     }
     
     public static String millisecondsNumberic(int randomCount) {

@@ -1,6 +1,6 @@
 package com.zb.commons.jxls;
 
-import com.zb.commons.date.DateOperator;
+import com.zb.commons.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jxls.transformer.XLSTransformer;
 import org.apache.commons.io.IOUtils;
@@ -55,6 +55,6 @@ public final class JxlsUtil {
     }
 
     private static String getFullFileName(String fileNamePrefix) {
-        return fileNamePrefix + DateOperator.defaultFormatDate(new Date()) + ".xls";
+        return fileNamePrefix + DateUtil.defaultFormatDate(new Date()) + ".xls";
     }
 }
