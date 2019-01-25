@@ -1,0 +1,6 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.jhj.commons.ftp.FtpAutoConfiguration,\
+com.jhj.commons.redis.JedisAutoConfiguration,\
+com.jhj.commons.http.HttpClientAutoConfiguration,\
+com.jhj.commons.threadpool.ThreadPoolAutoConfiguration
