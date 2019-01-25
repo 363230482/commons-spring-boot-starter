@@ -429,18 +429,28 @@ public final class DateOperator {
      * <br>
      *
      * @param dateStr
-     * @param withTime
      * @return
      */
-    public static Date defaultParse(String dateStr, boolean withTime) {
+    public static Date defaultParseDate(String dateStr) {
         try {
-            SimpleDateFormat sdf;
-            if (withTime) {
-                sdf = new SimpleDateFormat(FORMAT_STR_WITH_TIME);
-            } else {
-                sdf = new SimpleDateFormat(FORMAT_STR);
-            }
-            return sdf.parse(dateStr);
+            return new SimpleDateFormat(FORMAT_STR).parse(dateStr);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("parameter date string is not available");
+        }
+    }
+    
+    /**
+     * 将具有缺省日期/时间格式的日期/时间字符串转换为日期对象,可选择在转换时是否加入时部
+     * <br>
+     * 缺省日期时间格式 格式1:yyyy-MM-dd 格式2:yyyy-MM-dd HH:mm:ss
+     * <br>
+     *
+     * @param dateStr
+     * @return
+     */
+    public static Date defaultParseDateTime(String dateStr) {
+        try {
+            return new SimpleDateFormat(FORMAT_STR_WITH_TIME).parse(dateStr);
         } catch (Exception e) {
             throw new IllegalArgumentException("parameter date string is not available");
         }
